@@ -71,14 +71,14 @@ public class BasicTelop extends LinearOpMode {
     private Servo clawM = null;
     private ColorSensorV3 color_sensor = null;
     private bool isRedTeam = false;
-    private double thresh = 10.0;
+    private double thresh = 0.05; // its RBG, IR(1,1,1,1)
     if (isRedTeam) {
-        private Color team_color = Color(); // whatever red is basically; 
+        private Color team_color = Color(0.9, 0.05, 0.05, 0.75); // whatever red is basically; 
     }
     else if (!isRedteam) {
-        private Color team_color = Color(); //whatever blue is idl;
+        private Color team_color = Color(0.05, 0.05, 0.9, 0.75); //whatever blue is idl;
     }
-    private Color yellow = Color() //whatever yellow is;
+    private Color yellow = Color(0.5, 0.5, 0.05, 0.75) //whatever yellow is;
 
     @Override
     public void runOpMode() {
@@ -239,13 +239,13 @@ public class BasicTelop extends LinearOpMode {
             hslidesMotor.setPower(hslidesPower);
             //motor intake
             double intakeSpeed = 1.0;
-            // color sensor vs. differenece between what we want and what we sild get. 
-            // collest to team block or yellow block
+            // color difference between the expected block and the desired_block
             if ((abs(color.red-team_color.red) < thresh && abs(color.blue-team_color.blue) < thresh && abs(color.green-team_color.green) < thresh) || (abs(color.red-yellow.red) < thresh && abs(color.green-yellow.green) < thresh && abs(color.blue - yellow.blue) < thresh))  {
                 // this is a valid color to grab either its yellow or whatever the team color is
                 intakeOn = true;
             }
             if(gamepad1.left_bumper && !lb1Pressed) intakeDirection *= -1;
+            // manual control for intake, but its a toggle
             if(gamepad1.right_bumper && !rb1Pressed) {
                 intakeOn = !intakeOn;
                 if(transfer.pos != 0) transfer.toggle();
