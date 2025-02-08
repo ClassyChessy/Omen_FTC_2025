@@ -28,7 +28,7 @@
  */
 
 package org.firstinspires.ftc.teamcode;
-
+package com.revrobotics
 import com.acmerobotics.roadrunner.ftc.Encoder;
 import com.acmerobotics.roadrunner.ftc.OverflowEncoder;
 import com.acmerobotics.roadrunner.ftc.RawEncoder;
@@ -41,6 +41,8 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.revrobotics.ColorSensorV3;
+
 
 @TeleOp(name="Basic: Telop", group="Linear OpMode")
 public class BasicTelop extends LinearOpMode {
@@ -67,8 +69,16 @@ public class BasicTelop extends LinearOpMode {
     private Servo rarmM = null;
     private Servo elbowM = null;
     private Servo clawM = null;
-
-
+    private ColorSensorV3 color_sensor = null;
+    private bool isRedTeam = false;
+    private double thresh = 10.0;
+    if (isRedTeam) {
+        private Color team_color = Color(); // whatever red is basically; 
+    }
+    else if (!isRedteam) {
+        private Color team_color = Color(); //whatever blue is idl;
+    }
+    private Color yellow = Color() //whatever yellow is;
 
     @Override
     public void runOpMode() {
@@ -94,6 +104,7 @@ public class BasicTelop extends LinearOpMode {
         rarmM = hardwareMap.get(Servo.class, "rarm");
         elbowM = hardwareMap.get(Servo.class, "elbow");
         clawM = hardwareMap.get(Servo.class, "claw");
+        color_sensor = ColorSensorV3(I2C.Port port); // need to add whatever port here
 
         //initialize motor directions
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
@@ -190,6 +201,7 @@ public class BasicTelop extends LinearOpMode {
             double rightFrontPower = axial - lateral - yaw;
             double leftBackPower   = axial - lateral + yaw;
             double rightBackPower  = axial + lateral - yaw;
+            public static Color color = color_sensor.getColor();
 
             // Normalize the values so no wheel power exceeds 100%
             // This ensures that the robot maintains the desired motion.
@@ -227,6 +239,12 @@ public class BasicTelop extends LinearOpMode {
             hslidesMotor.setPower(hslidesPower);
             //motor intake
             double intakeSpeed = 1.0;
+            // color sensor vs. differenece between what we want and what we sild get. 
+            // collest to team block or yellow block
+            if ((abs(color.red-team_color.red) < thresh && abs(color.blue-team_color.blue) < thresh && abs(color.green-team_color.green) < thresh) || (abs(color.red-yellow.red) < thresh && abs(color.green-yellow.green) < thresh && abs(color.blue - yellow.blue) < thresh))  {
+                // this is a valid color to grab either its yellow or whatever the team color is
+                intakeOn = true;
+            }
             if(gamepad1.left_bumper && !lb1Pressed) intakeDirection *= -1;
             if(gamepad1.right_bumper && !rb1Pressed) {
                 intakeOn = !intakeOn;
